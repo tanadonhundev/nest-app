@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
@@ -9,6 +9,7 @@ import { ProductModule } from './product/product.module';
 import { User } from './auth/entities/user.entity';
 import { Product } from './product/entities/product.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
+import { LoggerMiddleware } from './common/logger.middleware';
 
 @Module({
   imports: [
@@ -31,4 +32,8 @@ import { RefreshToken } from './auth/entities/refresh-token.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*'); // ใช้ Middleware สำหรับทุก API
+  }
+}
