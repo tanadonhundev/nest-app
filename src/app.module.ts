@@ -10,6 +10,9 @@ import { User } from './auth/entities/user.entity';
 import { Product } from './product/entities/product.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { LoggerMiddleware } from './common/logger.middleware';
+import { OrderModule } from './order/order.module';
+import { OrderItem } from './order/entities/order-item.entity';
+import { Order } from './order/entities/order.entity';
 
 @Module({
   imports: [
@@ -21,13 +24,14 @@ import { LoggerMiddleware } from './common/logger.middleware';
       username: process.env.DB_USER,
       password: process.env.UB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, Product, RefreshToken],
+      entities: [User, Product, RefreshToken, OrderItem, Order],
       autoLoadEntities: true,
       synchronize: true,
     }),
     DatabaseModule,
     AuthModule,
     ProductModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
