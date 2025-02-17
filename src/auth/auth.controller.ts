@@ -12,7 +12,7 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     await this.authService.register(registerDto);
     return {
-      messsge: 'ลงทะเบียนสำเร็จ',
+      message: 'Successfully registered',
     };
   }
   // localhost:4000/api/v1/auth/login

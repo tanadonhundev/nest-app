@@ -19,13 +19,13 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto): Promise<User> {
     //เช็คอีเมลซ้ำ
     const user = await this.usersRepository.findOne({
       where: { email: registerDto.email },
     });
     if (user) {
-      throw new BadRequestException('มีอีเมลนี้ในระบบแล้ว');
+      throw new BadRequestException('This email is already in the system');
     }
     // hash password
     const salt = await genSalt(10);
@@ -48,12 +48,12 @@ export class AuthService {
       where: { email: loginDto.email },
     });
     if (!user) {
-      throw new UnauthorizedException('ไม่พบผู้ใช้นี้ในระบบ'); //401
+      throw new UnauthorizedException('User not found'); //401
     }
     // เปรียบเทียบรหัสผ่าน
     const isValid = await compare(loginDto.password, user.password);
     if (!isValid) {
-      throw new UnauthorizedException('รหัสผ่านไม่ถูกต้อง'); //401
+      throw new UnauthorizedException('password is incorrect'); //401
     }
     //gen jwt token
     const payload = { user_id: user.id };
