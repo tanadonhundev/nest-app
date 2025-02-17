@@ -22,4 +22,10 @@ export class AuthController {
     await this.authService.login(loginDto);
     return await this.authService.login(loginDto);
   }
+  // localhost:4000/api/v1/auth/refresh
+  @Post('refresh')
+  @HttpCode(201)
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
+  }
 }

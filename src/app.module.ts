@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './product/product.module';
 import { User } from './auth/entities/user.entity';
 import { Product } from './product/entities/product.entity';
+import { RefreshToken } from './auth/entities/refresh-token.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { Product } from './product/entities/product.entity';
       username: process.env.DB_USER,
       password: process.env.UB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, Product],
+      entities: [User, Product, RefreshToken],
       autoLoadEntities: true,
       synchronize: true,
     }),
