@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { createObjectCsvStringifier } from 'csv-writer';
 
 @Injectable()
 export class ProductsService {
@@ -63,5 +64,23 @@ export class ProductsService {
   async remove(id: number): Promise<void> {
     const result = await this.productsRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException('Product not found');
+  }
+
+  async generateCSV(): Promise<string> {
+    const products = await this.findAll();
+
+    const csvStringifier = createObjectCsvStringifier({
+      header: [
+        { id: 'id', title: 'ID' },
+        { id: 'name', title: 'Product Name' },
+        { id: 'price', title: 'Price' },
+      ],
+    });
+
+    const csvData =
+      csvStringifier.getHeaderString() +
+      csvStringifier.stringifyRecords(products);
+
+    return csvData;
   }
 }

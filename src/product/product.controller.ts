@@ -7,7 +7,9 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ProductsService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -51,5 +53,15 @@ export class ProductsController {
     return {
       message: 'Product information successfully deleted',
     };
+  }
+
+  @Get('export')
+  async exportCSV(@Res() res: Response) {
+    const csvData = await this.productsService.generateCSV();
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="products.csv"');
+
+    res.send(csvData);
   }
 }
