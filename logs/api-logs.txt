@@ -1,0 +1,5 @@
+GET /api/v1/products/export - Response Time: 3ms
+GET /api/v1/products/export - Response Time: 0ms
+GET /api/v1/products/export - Response Time: 4ms
+GET /api/v1/products/export - Response Time: 1ms
+GET /api/v1/products/export - Response Time: 1ms
