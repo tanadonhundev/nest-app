@@ -98,6 +98,11 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
+  async logout(userId: number) {
+    console.log(userId);
+    return this.refreshTokenRepository.update({ userId }, { token: null });
+  }
+
   async refreshToken(refreshToken: string) {
     const tokens = await this.refreshTokenRepository.find();
     let validToken: RefreshToken | null = null;

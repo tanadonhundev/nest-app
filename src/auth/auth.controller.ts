@@ -1,7 +1,18 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { RefreshTokenGuard } from './refreshToken.guard';
 
 @Controller({ path: 'auth', version: '1' }) // localhost:4000/api/v1/auth
 export class AuthController {
@@ -22,7 +33,13 @@ export class AuthController {
     await this.authService.login(loginDto);
     return await this.authService.login(loginDto);
   }
+  @UseGuards(JwtAuthGuard)
+  @Get('logout')
+  logout(@Req() req: Request) {
+    this.authService.logout(req.user['user_id']);
+  }
   // localhost:4000/api/v1/auth/refresh
+  @UseGuards(RefreshTokenGuard)
   @Post('refresh')
   @HttpCode(201)
   async refresh(@Body('refreshToken') refreshToken: string) {
