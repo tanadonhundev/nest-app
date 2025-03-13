@@ -24,27 +24,38 @@ export class AuthService {
 
   async generateTokens(user: User) {
     const payload = { user_id: user.id };
+
+    // สร้าง Access Token
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: '15m', // Access Token มีอายุ 15 นาที
     });
 
+    // สร้าง Refresh Token
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: '7d', // Refresh Token มีอายุ 7 วัน
     });
 
-    // Hash Refresh Token
-    const hashedRefreshToken = await hash(refreshToken, 10);
+    // เพิ่ม Salt ในการ Hash เพื่อให้ค่าของ token แตกต่างกันทุกครั้ง
+    const salt = await genSalt(10);
+    const hashedRefreshToken = await hash(refreshToken, salt);
 
-    // ลบ Refresh Token เก่าของผู้ใช้
-    await this.refreshTokenRepository.delete({ user });
-
-    // บันทึก Refresh Token ใหม่
-    await this.refreshTokenRepository.save({
-      token: hashedRefreshToken,
-      user,
+    // ตรวจสอบว่า Refresh Token ของผู้ใช้มีอยู่แล้วหรือไม่
+    const existingToken = await this.refreshTokenRepository.findOne({
+      where: { user },
     });
+    if (existingToken) {
+      // ถ้ามีอยู่แล้ว อัปเดต token ใหม่
+      existingToken.token = hashedRefreshToken;
+      await this.refreshTokenRepository.save(existingToken);
+    } else {
+      // ถ้าไม่มี ให้สร้างใหม่
+      await this.refreshTokenRepository.save({
+        token: hashedRefreshToken,
+        user,
+      });
+    }
 
     return { access_token: accessToken, refresh_token: refreshToken };
   }
@@ -101,11 +112,10 @@ export class AuthService {
     if (!validToken) {
       throw new UnauthorizedException('Invalid refresh token');
     }
-
     const user = await this.usersRepository.findOne({
-      where: { id: validToken.user.id },
+      where: { id: validToken.userId },
+      // select: ['id', 'firstName', 'lastName', 'email'],
     });
-
     return this.generateTokens(user);
   }
 }
