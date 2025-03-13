@@ -99,7 +99,6 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    console.log(userId);
     return this.refreshTokenRepository.update({ userId }, { token: null });
   }
 

@@ -40,9 +40,9 @@ export class AuthController {
   }
   // localhost:4000/api/v1/auth/refresh
   @UseGuards(RefreshTokenGuard)
-  @Post('refresh')
-  @HttpCode(201)
-  async refresh(@Body('refreshToken') refreshToken: string) {
+  @Get('refresh')
+  refreshTokens(@Req() req: Request) {
+    const refreshToken = req.user['refreshToken'];
     return this.authService.refreshToken(refreshToken);
   }
 }
